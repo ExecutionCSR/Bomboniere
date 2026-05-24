@@ -46,7 +46,6 @@ button {
 }
 
 .catalog-header,
-.hero-card,
 .stat-card,
 .product-card,
 .filters-panel,
@@ -59,9 +58,12 @@ button {
   box-shadow: var(--shadow);
 }
 
-.hero-card,
 .catalog-header {
-  padding: 28px 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
   margin-bottom: 18px;
 }
 
@@ -87,15 +89,10 @@ button {
   text-transform: uppercase;
 }
 
-.catalog-header h1,
 .section-heading h2 {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   line-height: 1.05;
-}
-
-.catalog-header h1 {
-  font-size: clamp(2.4rem, 5vw, 4rem);
 }
 
 .catalog-header p,
@@ -117,31 +114,6 @@ button {
   font-weight: 700;
 }
 
-.hero-card {
-  display: grid;
-  gap: 10px;
-  align-content: center;
-  padding: 28px;
-  background: linear-gradient(180deg, #fff7ec 0%, #ffe6c1 100%);
-}
-
-.hero-card.compact {
-  min-width: 220px;
-}
-
-.catalog-title-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  align-items: center;
-}
-
-.header-side {
-  display: grid;
-  gap: 12px;
-  justify-items: end;
-}
-
 .hero-card-label,
 .price-label,
 .product-code,
@@ -151,23 +123,43 @@ button {
   letter-spacing: 0.06em;
 }
 
-.hero-card strong {
-  font-size: 2rem;
-}
-
 .stat-card span,
 .product-code,
 .product-content p {
   display: block;
 }
 
+.catalog-header-brand,
+.catalog-header-text,
+.catalog-header-separator {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.catalog-header-brand {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.catalog-header-separator {
+  opacity: 0.55;
+}
+
 .filters-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr) auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   padding: 18px;
   margin-bottom: 24px;
-  align-items: end;
+  align-items: flex-end;
+}
+
+.filter-tabs {
+  display: flex;
+  flex: 1 1 520px;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
 }
 
 .filter-field {
@@ -175,6 +167,10 @@ button {
   gap: 8px;
   color: var(--muted);
   font-weight: 700;
+}
+
+.filter-search-field {
+  flex: 1 1 280px;
 }
 
 .filter-field input,
@@ -200,13 +196,6 @@ button {
   cursor: pointer;
   font: inherit;
   font-weight: 800;
-}
-
-.category-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 24px;
 }
 
 .category-tab {
@@ -591,6 +580,20 @@ button {
   margin-top: 18px;
 }
 
+.admin-inline-button {
+  justify-content: center;
+}
+
+.admin-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-list-actions p {
+  margin: 0;
+}
+
 .admin-products-list {
   display: grid;
   gap: 14px;
@@ -907,12 +910,6 @@ button {
     grid-template-columns: 1fr;
   }
 
-  .catalog-title-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-side,
   .admin-header,
   .admin-layout {
     grid-template-columns: 1fr;
@@ -939,17 +936,6 @@ button {
     padding: 14px;
   }
 
-  .category-tabs {
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    flex-wrap: nowrap;
-  }
-
-  .category-tab {
-    white-space: nowrap;
-  }
-
   .products-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
@@ -967,6 +953,11 @@ button {
     flex-direction: column;
   }
 
+  .admin-list-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .product-footer {
     flex-direction: column;
     align-items: stretch;
@@ -976,6 +967,22 @@ button {
   .product-footer button,
   .clear-filters-button {
     width: 100%;
+  }
+
+  .filter-tabs {
+    flex-basis: 100%;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    flex-wrap: nowrap;
+  }
+
+  .filter-search-field {
+    flex-basis: 100%;
+  }
+
+  .category-tab {
+    white-space: nowrap;
   }
 
   .product-gallery {
@@ -1020,7 +1027,6 @@ button {
   }
 
   .catalog-header,
-  .hero-card,
   .stat-card,
   .product-card,
   .filters-panel,
@@ -1029,11 +1035,12 @@ button {
   }
 
   .catalog-header {
-    padding: 24px;
+    gap: 8px;
+    padding: 12px 14px;
   }
 
-  .catalog-header h1 {
-    font-size: 2rem;
+  .filters-panel {
+    align-items: stretch;
   }
 
   .section-heading h2 {

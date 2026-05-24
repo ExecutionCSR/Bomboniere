@@ -32,8 +32,9 @@ export default function Home() {
     return matchesCategory && matchesSearch;
   });
 
-  const prices = products.map((product) => product.price);
-  const lowestPrice = prices.length > 0 ? Math.min(...prices) : 0;
+  const headerSummary = isLoading
+    ? "Carregando produtos..."
+    : `${products.length} produtos • ${uniqueCategories.length} categorias`;
 
   return (
     <main className="page-shell">
@@ -53,28 +54,35 @@ export default function Home() {
       ) : null}
 
       <section className="catalog-header">
-        <div className="catalog-title-row">
-          <div>
-            <span className="eyebrow">{storeConfig.name}</span>
-            <h1>Vitrine de produtos</h1>
-            <p>Escolha por nome ou categoria e navegue direto pelo catalogo da loja.</p>
-          </div>
-          <div className="header-side">
-            <Link href="/admin/produtos" className="secondary-link admin-link">
-              Area admin
-            </Link>
-            <div className="hero-card compact">
-              <p className="hero-card-label">Resumo inicial</p>
-              <strong>{isLoading ? "..." : `${products.length} produtos`}</strong>
-              <span>{uniqueCategories.length} categorias</span>
-              <span>A partir de {currency.format(lowestPrice)}</span>
-            </div>
-          </div>
-        </div>
+        <span className="catalog-header-brand">{storeConfig.name}</span>
+        <span className="catalog-header-separator">•</span>
+        <span className="catalog-header-text">Vitrine de produtos</span>
+        <span className="catalog-header-separator">•</span>
+        <span className="catalog-header-text">{headerSummary}</span>
       </section>
 
       <section className="filters-panel" aria-label="Filtros da vitrine">
-        <label className="filter-field">
+        <div className="filter-tabs" aria-label="Categorias">
+          <button
+            type="button"
+            className={`category-tab${category === "Todos" ? " active" : ""}`}
+            onClick={() => setCategory("Todos")}
+          >
+            Todas
+          </button>
+          {uniqueCategories.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className={`category-tab${category === item ? " active" : ""}`}
+              onClick={() => setCategory(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+
+        <label className="filter-field filter-search-field">
           <span>Buscar por nome</span>
           <input
             type="text"
@@ -82,18 +90,6 @@ export default function Home() {
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Ex.: pacoca, coca-cola, chiclete"
           />
-        </label>
-
-        <label className="filter-field">
-          <span>Categoria</span>
-          <select value={category} onChange={(event) => setCategory(event.target.value)}>
-            <option value="Todos">Todas</option>
-            {uniqueCategories.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
         </label>
 
         <button
@@ -106,26 +102,6 @@ export default function Home() {
         >
           Limpar filtros
         </button>
-      </section>
-
-      <section className="category-tabs" aria-label="Atalhos por categoria">
-        <button
-          type="button"
-          className={`category-tab${category === "Todos" ? " active" : ""}`}
-          onClick={() => setCategory("Todos")}
-        >
-          Todas
-        </button>
-        {uniqueCategories.map((item) => (
-          <button
-            key={item}
-            type="button"
-            className={`category-tab${category === item ? " active" : ""}`}
-            onClick={() => setCategory(item)}
-          >
-            {item}
-          </button>
-        ))}
       </section>
 
       <section className="products-section">
@@ -159,21 +135,21 @@ export default function Home() {
                   <span className={`stock-badge${product.availableQuantity === 0 ? " empty" : ""}`}>
                     {product.availableQuantity === 0
                       ? "Sem estoque"
-                      : `${product.availableQuantity} disponivel${product.availableQuantity === 1 ? "" : "eis"}`}
+                      : `${product.availableQuantity} disponív${product.availableQuantity === 1 ? "el" : "eis"}`}
                   </span>
                 </div>
               </Link>
 
               <div className="product-footer">
                 <div className="price-block">
-                  <span className="price-label">Preco</span>
+                  <span className="price-label">Preço</span>
                   <strong className="price-value">{currency.format(product.price)}</strong>
                 </div>
                 <AddToCartButton
                   productId={product.id}
                   className="buy-button"
                   disabled={product.availableQuantity === 0}
-                  label={product.availableQuantity === 0 ? "Indisponivel" : "Comprar"}
+                  label={product.availableQuantity === 0 ? "Indisponível" : "Comprar"}
                 />
               </div>
             </article>

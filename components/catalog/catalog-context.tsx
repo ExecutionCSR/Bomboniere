@@ -1,10 +1,12 @@
 "use client";
 
 import {
+  useCallback,
   createContext,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -40,8 +42,9 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasBootstrappedRef = useRef(false);
 
-  const refreshProducts = async () => {
+  const refreshProducts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -59,11 +62,16 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    if (hasBootstrappedRef.current) {
+      return;
+    }
+
+    hasBootstrappedRef.current = true;
     void refreshProducts();
-  }, []);
+  }, [refreshProducts]);
 
   const value = useMemo(
     () => ({
@@ -79,10 +87,14 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
         });
 
         if (!response.ok) {
-          throw new Error("Falha ao cadastrar produto.");
+          const data = (await response.json()) as { error?: string };
+          throw new Error(data.error || "Falha ao cadastrar produto.");
         }
 
-        await refreshProducts();
+        const createdProduct = (await response.json()) as CatalogProduct;
+        setProducts((current) =>
+          [...current, createdProduct].sort((left, right) => left.code - right.code),
+        );
       },
       updateProduct: async (productId: string, product: CatalogInput) => {
         const response = await fetch(`/api/products/${productId}`, {
@@ -92,10 +104,16 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
         });
 
         if (!response.ok) {
-          throw new Error("Falha ao atualizar produto.");
+          const data = (await response.json()) as { error?: string };
+          throw new Error(data.error || "Falha ao atualizar produto.");
         }
 
-        await refreshProducts();
+        const updatedProduct = (await response.json()) as CatalogProduct;
+        setProducts((current) =>
+          current
+            .map((item) => (item.id === productId ? updatedProduct : item))
+            .sort((left, right) => left.code - right.code),
+        );
       },
       removeProduct: async (productId: string) => {
         const response = await fetch(`/api/products/${productId}`, {
@@ -106,10 +124,10 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
           throw new Error("Falha ao remover produto.");
         }
 
-        await refreshProducts();
+        setProducts((current) => current.filter((item) => item.id !== productId));
       },
     }),
-    [products, isLoading, error],
+    [products, isLoading, error, refreshProducts],
   );
 
   return <CatalogContext.Provider value={value}>{children}</CatalogContext.Provider>;

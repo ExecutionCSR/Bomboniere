@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   createContext,
   useContext,
   useMemo,
@@ -43,7 +44,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshOrders = async () => {
+  const refreshOrders = useCallback(async () => {
     setError(null);
 
     try {
@@ -63,7 +64,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       setOrders([]);
       setError(err instanceof Error ? err.message : "Falha ao conectar com os pedidos.");
     }
-  };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -80,9 +81,12 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
         if (!response.ok) {
           throw new Error("Falha ao registrar pedido.");
         }
+
+        const createdOrder = (await response.json()) as OrderRecord;
+        setOrders((current) => [createdOrder, ...current]);
       },
     }),
-    [orders, error],
+    [orders, error, refreshOrders],
   );
 
   return <OrdersContext.Provider value={value}>{children}</OrdersContext.Provider>;

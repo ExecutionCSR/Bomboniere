@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useCatalog } from "@/components/catalog/catalog-context";
 import { useOrders } from "@/components/orders/orders-context";
 import { productCategories, type Product } from "@/data/products";
@@ -42,8 +42,15 @@ export default function AdminProductsPage() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [authError, setAuthError] = useState("");
   const [actionError, setActionError] = useState("");
+  const hasBootstrappedRef = useRef(false);
 
   useEffect(() => {
+    if (hasBootstrappedRef.current) {
+      return;
+    }
+
+    hasBootstrappedRef.current = true;
+
     const bootstrap = async () => {
       const response = await fetch("/api/admin/session", { cache: "no-store" });
       const data = (await response.json()) as { authenticated: boolean };
@@ -195,6 +202,9 @@ export default function AdminProductsPage() {
               <span className="eyebrow">{editingId ? "Edicao" : "Cadastro"}</span>
               <h2>{editingId ? "Editar produto" : "Novo produto"}</h2>
             </div>
+            <button type="button" className="secondary-link admin-inline-button" onClick={resetForm}>
+              Novo produto
+            </button>
           </div>
 
           <div className="admin-form-grid">
@@ -320,7 +330,12 @@ export default function AdminProductsPage() {
               <span className="eyebrow">Catalogo</span>
               <h2>Produtos cadastrados</h2>
             </div>
-            <p>{orderedProducts.length} itens</p>
+            <div className="admin-list-actions">
+              <p>{orderedProducts.length} itens</p>
+              <button type="button" className="secondary-link admin-inline-button" onClick={resetForm}>
+                Adicionar novo
+              </button>
+            </div>
           </div>
 
           <div className="admin-products-list">
@@ -343,6 +358,13 @@ export default function AdminProductsPage() {
                     type="button"
                     className="clear-cart-link danger-link"
                     onClick={async () => {
+                      const confirmed = window.confirm(
+                        `Remover o produto "${product.name}" do catalogo?`,
+                      );
+                      if (!confirmed) {
+                        return;
+                      }
+
                       await removeProduct(product.id);
                       if (editingId === product.id) {
                         resetForm();
